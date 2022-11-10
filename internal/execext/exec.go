@@ -3,6 +3,7 @@ package execext
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -17,12 +18,14 @@ import (
 
 // RunCommandOptions is the options for the RunCommand func
 type RunCommandOptions struct {
-	Command string
-	Dir     string
-	Env     []string
-	Stdin   io.Reader
-	Stdout  io.Writer
-	Stderr  io.Writer
+	Command   string
+	Dir       string
+	Env       []string
+	POSIXOpts []string
+	BashOpts  []string
+	Stdin     io.Reader
+	Stdout    io.Writer
+	Stderr    io.Writer
 }
 
 var (
@@ -36,6 +39,31 @@ func RunCommand(ctx context.Context, opts *RunCommandOptions) error {
 		return ErrNilOptions
 	}
 
+	// Set "-e" or "errexit" by default
+	opts.POSIXOpts = append(opts.POSIXOpts, "e")
+
+	// Format POSIX options into a slice that mvdan/sh understands
+	var params []string
+	for _, opt := range opts.POSIXOpts {
+		if len(opt) == 1 {
+			params = append(params, fmt.Sprintf("-%s", opt))
+		} else {
+			params = append(params, "-o")
+			params = append(params, opt)
+		}
+	}
+
+	var s []string
+
+	// Manually adding bash opts before each command as there is no interp.Shopts
+	if len(opts.BashOpts) > 0 {
+		s = append(s, fmt.Sprintf("shopt -s %s", strings.Join(opts.BashOpts, " ")))
+	}
+
+	if len(s) > 0 {
+		opts.Command = strings.Join(append(s, opts.Command), " && ")
+	}
+
 	p, err := syntax.NewParser().Parse(strings.NewReader(opts.Command), "")
 	if err != nil {
 		return err
@@ -47,7 +75,7 @@ func RunCommand(ctx context.Context, opts *RunCommandOptions) error {
 	}
 
 	r, err := interp.New(
-		interp.Params("-e"),
+		interp.Params(params...),
 		interp.Env(expand.ListEnviron(environ...)),
 		interp.ExecHandler(interp.DefaultExecHandler(15*time.Second)),
 		interp.OpenHandler(openHandler),

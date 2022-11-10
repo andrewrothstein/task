@@ -1621,3 +1621,87 @@ Hello, World!
 	err = os.RemoveAll(filepathext.SmartJoin(dir, "src"))
 	assert.NoError(t, err)
 }
+
+func TestPOSIXShellOptsGlobalLevel(t *testing.T) {
+	var buff bytes.Buffer
+	e := task.Executor{
+		Dir:    "testdata/shopts/global_level",
+		Stdout: &buff,
+		Stderr: &buff,
+	}
+	assert.NoError(t, e.Setup())
+
+	err := e.Run(context.Background(), taskfile.Call{Task: "pipefail"})
+	assert.NoError(t, err)
+	assert.Equal(t, "pipefail\ton\n", buff.String())
+}
+
+func TestPOSIXShellOptsTaskLevel(t *testing.T) {
+	var buff bytes.Buffer
+	e := task.Executor{
+		Dir:    "testdata/shopts/task_level",
+		Stdout: &buff,
+		Stderr: &buff,
+	}
+	assert.NoError(t, e.Setup())
+
+	err := e.Run(context.Background(), taskfile.Call{Task: "pipefail"})
+	assert.NoError(t, err)
+	assert.Equal(t, "pipefail\ton\n", buff.String())
+}
+
+func TestPOSIXShellOptsCommandLevel(t *testing.T) {
+	var buff bytes.Buffer
+	e := task.Executor{
+		Dir:    "testdata/shopts/command_level",
+		Stdout: &buff,
+		Stderr: &buff,
+	}
+	assert.NoError(t, e.Setup())
+
+	err := e.Run(context.Background(), taskfile.Call{Task: "pipefail"})
+	assert.NoError(t, err)
+	assert.Equal(t, "pipefail\ton\n", buff.String())
+}
+
+func TestBashShellOptsGlobalLevel(t *testing.T) {
+	var buff bytes.Buffer
+	e := task.Executor{
+		Dir:    "testdata/shopts/global_level",
+		Stdout: &buff,
+		Stderr: &buff,
+	}
+	assert.NoError(t, e.Setup())
+
+	err := e.Run(context.Background(), taskfile.Call{Task: "globstar"})
+	assert.NoError(t, err)
+	assert.Equal(t, "globstar\ton\n", buff.String())
+}
+
+func TestBashShellOptsTaskLevel(t *testing.T) {
+	var buff bytes.Buffer
+	e := task.Executor{
+		Dir:    "testdata/shopts/task_level",
+		Stdout: &buff,
+		Stderr: &buff,
+	}
+	assert.NoError(t, e.Setup())
+
+	err := e.Run(context.Background(), taskfile.Call{Task: "globstar"})
+	assert.NoError(t, err)
+	assert.Equal(t, "globstar\ton\n", buff.String())
+}
+
+func TestBashShellOptsCommandLevel(t *testing.T) {
+	var buff bytes.Buffer
+	e := task.Executor{
+		Dir:    "testdata/shopts/command_level",
+		Stdout: &buff,
+		Stderr: &buff,
+	}
+	assert.NoError(t, e.Setup())
+
+	err := e.Run(context.Background(), taskfile.Call{Task: "globstar"})
+	assert.NoError(t, err)
+	assert.Equal(t, "globstar\ton\n", buff.String())
+}

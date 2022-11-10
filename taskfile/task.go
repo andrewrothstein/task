@@ -17,6 +17,8 @@ type Task struct {
 	Status               []string
 	Preconditions        []*Precondition
 	Dir                  string
+	Set                  []string
+	Shopts               []string
 	Vars                 *Vars
 	Env                  *Vars
 	Silent               bool
@@ -63,6 +65,8 @@ func (t *Task) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		Status        []string
 		Preconditions []*Precondition
 		Dir           string
+		Set           []string
+		Shopts        []string
 		Vars          *Vars
 		Env           *Vars
 		Silent        bool
@@ -87,6 +91,8 @@ func (t *Task) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	t.Status = task.Status
 	t.Preconditions = task.Preconditions
 	t.Dir = task.Dir
+	t.Set = task.Set
+	t.Shopts = task.Shopts
 	t.Vars = task.Vars
 	t.Env = task.Env
 	t.Silent = task.Silent
@@ -115,6 +121,8 @@ func (t *Task) DeepCopy() *Task {
 		Status:               deepCopySlice(t.Status),
 		Preconditions:        deepCopySlice(t.Preconditions),
 		Dir:                  t.Dir,
+		Set:                  deepCopySlice(t.Set),
+		Shopts:               deepCopySlice(t.Shopts),
 		Vars:                 t.Vars.DeepCopy(),
 		Env:                  t.Env.DeepCopy(),
 		Silent:               t.Silent,
