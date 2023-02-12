@@ -108,6 +108,20 @@
             "description": "The directory in which this task should run. Defaults to the current working directory.",
             "type": "string"
           },
+          "set": {
+            "description": "Enables POSIX shell options for all of a task's commands. See https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/3/set"
+            }
+          },
+          "shopt": {
+            "description": "Enables Bash shell options for all of a task's commands. See https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/3/shopt"
+            }
+          },
           "vars": {
             "description": "A set of variables that can be used in the task.",
             "$ref": "#/definitions/3/vars"
@@ -155,6 +169,13 @@
           "run": {
             "description": "Specifies whether the task should run again or not if called more than once. Available options: `always`, `once` and `when_changed`.",
             "$ref": "#/definitions/3/run"
+          },
+          "platforms": {
+            "description": "Specifies which platforms the task should be run on.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -176,6 +197,14 @@
             "$ref": "#/definitions/3/task_call"
           }
         ]
+      },
+      "set": {
+        "type": "string",
+        "enum": ["allexport", "a", "errexit", "e", "noexec", "n", "noglob", "f", "nounset", "u", "xtrace", "x", "pipefail"]
+      },
+      "shopt": {
+        "type": "string",
+        "enum": ["expand_aliases", "globstar", "nullglob"]
       },
       "vars": {
         "type": "object",
@@ -226,6 +255,20 @@
             "description": "Silent mode disables echoing of command before Task runs it",
             "type": "boolean"
           },
+          "set": {
+            "description": "Enables POSIX shell options for this command. See https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/3/set"
+            }
+          },
+          "shopt": {
+            "description": "Enables Bash shell options for this command. See https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/3/shopt"
+            }
+          },
           "ignore_error": {
             "description": "Prevent command from aborting the execution of task even after receiving a status code of 1",
             "type": "boolean"
@@ -233,6 +276,13 @@
           "defer": {
             "description": "",
             "type": "boolean"
+          },
+          "platforms": {
+            "description": "Specifies which platforms the command should be run on.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false,
@@ -357,6 +407,20 @@
           "description": "Default 'silent' options for this Taskfile. If `false`, can be overidden with `true` in a task by task basis.",
           "type": "boolean"
         },
+        "set": {
+          "description": "Enables POSIX shell options for all commands in the Taskfile. See https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/3/set"
+          }
+        },
+        "shopt": {
+          "description": "Enables Bash shell options for all commands in the Taskfile. See https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/3/shopt"
+          }
+        },
         "dotenv": {
           "type": "array",
           "description": "A list of `.env` file paths to be parsed.",
@@ -370,7 +434,8 @@
         },
         "interval": {
           "description": "Sets a different watch interval when using `--watch`, the default being 5 seconds. This string should be a valid Go duration: https://pkg.go.dev/time#ParseDuration.",
-          "$ref": "#/definitions/3/run"
+          "type": "string",
+          "pattern": "^[0-9]+(?:m|s|ms)$"
         }
       },
       "additionalProperties": false,
